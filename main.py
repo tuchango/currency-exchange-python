@@ -76,12 +76,9 @@ class SimpleHTMLHandler(BaseHTTPRequestHandler):
                     "USDALL": 126.1652,
                     "USDAMD": 475.306,
                     "USDANG": 1.78952,
-                    "USDAOA": 109.216875,
-                    "USDARS": 8.901966,
-                    "USDAUD": 1.269072,
-                    "USDAWG": 1.792375,
-                    "USDAZN": 1.04945,
-                    "USDBAM": 1.757305
+                    # === #
+                    "USDRUB": 82.87,
+                    "USDKZT": 514.89
                 }
             }
             body = json.dumps(response).encode("utf-8")
@@ -102,7 +99,11 @@ class SimpleHTMLHandler(BaseHTTPRequestHandler):
                     "AFN": "Afghan Afghani",
                     "ALL": "Albanian Lek",
                     "AMD": "Armenian Dram",
-                    "ANG": "Netherlands Antillean Guilder"
+                    "ANG": "Netherlands Antillean Guilder",
+                    # === #
+                    "USD": "United States Dollar",
+                    "RUB": "Russian Ruble",
+                    "KZT": "Tenge"
                 }
             }
             body = json.dumps(response).encode("utf-8")
