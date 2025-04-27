@@ -4,7 +4,7 @@ from urllib.parse import parse_qs, urlparse
 from urllib.request import urlopen
 
 
-API_URL = "https://api.exchangerate.host/convert"
+API_URL = "https://api.exchangerate.host"
 ACCESS_KEY = 'dff5d216fd9de66bfd816b3703cad9c7'
 
 
@@ -13,7 +13,7 @@ def fetch_rate(ACCESS_KEY: str, from_curr: str, to_curr: str, amount: float) -> 
     Запрашивает курс base → target у exchangerate.host.
     Вернёт float или None, если что-то пошло не так.
     """
-    query = f"?access_key={ACCESS_KEY}&from={from_curr}&to={to_curr}&amount={amount}"
+    query = f"/convert?access_key={ACCESS_KEY}&from={from_curr}&to={to_curr}&amount={amount}"
     try:
         with urlopen(API_URL + query) as req:
             data = json.load(req)
@@ -62,6 +62,57 @@ class SimpleHTMLHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
+
+        elif path == '/live':
+            response = {
+                "success": True,
+                "terms": "https://exchangerate.host/terms",
+                "privacy": "https://exchangerate.host/privacy",
+                "timestamp": 1430401802,
+                "source": "USD",
+                "quotes": {
+                    "USDAED": 3.672982,
+                    "USDAFN": 57.8936,
+                    "USDALL": 126.1652,
+                    "USDAMD": 475.306,
+                    "USDANG": 1.78952,
+                    "USDAOA": 109.216875,
+                    "USDARS": 8.901966,
+                    "USDAUD": 1.269072,
+                    "USDAWG": 1.792375,
+                    "USDAZN": 1.04945,
+                    "USDBAM": 1.757305
+                }
+            }
+            body = json.dumps(response).encode("utf-8")
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        elif path == '/list':
+            response = {
+                "success": True,
+                "terms": "https://exchangerate.host/terms",
+                "privacy": "https://exchangerate.host/privacy",
+                "currencies": {
+                    "AED": "United Arab Emirates Dirham",
+                    "AFN": "Afghan Afghani",
+                    "ALL": "Albanian Lek",
+                    "AMD": "Armenian Dram",
+                    "ANG": "Netherlands Antillean Guilder"
+                }
+            }
+            body = json.dumps(response).encode("utf-8")
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
         else:
             html = "<h1>Hello, Converter!</h1>".encode("utf-8")
             self.send_response(200)
