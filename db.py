@@ -6,11 +6,9 @@ from urllib.request import urlopen
 API_URL = "http://localhost:8000"
 ACCESS_KEY = 'dff5d216fd9de66bfd816b3703cad9c7'
 
-con = sqlite3.connect('currencies.db')
-cur = con.cursor()
-
 
 def update_db_from_api():
+    con = sqlite3.connect('currencies.db')
 
     # запрашиваем список валют
     try:
@@ -51,29 +49,17 @@ def update_db_from_api():
             """, (exchange_rate[:3], exchange_rate[3:], exchange_rates[exchange_rate]))
         
     con.commit()
+    con.close()
 
 def create_db_and_fill_it():
-    cur.execute("DROP TABLE IF EXISTS Currencies")
-    cur.execute("DROP TABLE IF EXISTS ExchangeRates")
+    with open('db/schema.sql', 'r') as sql_file:
+        sql_script = sql_file.read()
 
-    cur.execute("""
-        CREATE TABLE Currencies (
-            id          INTEGER PRIMARY KEY,
-            code        TEXT,
-            full_name   TEXT
-        )
-    """)
-
-    cur.execute("""
-        CREATE TABLE ExchangeRates (
-            id          INTEGER PRIMARY KEY,
-            base_curr   INTEGER,
-            target_curr INTEGER,
-            rate        REAL
-        )
-    """)
-
-    con.commit()
+    db = sqlite3.connect('currencies.db')
+    cursor = db.cursor()
+    cursor.executescript(sql_script)
+    db.commit()
+    db.close()
 
     update_db_from_api()
 
