@@ -1,1 +1,2 @@
-currencies.db
+/.venv/
+/currencies.db

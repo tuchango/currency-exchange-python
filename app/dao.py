@@ -32,8 +32,17 @@ def get_currency_by_code(code: str) -> Currency | None:
     return None
 
 
-def add_currency(Currency) -> None:
-    pass
+def add_currency(currency: Currency) -> None:
+    conn = _get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+            INSERT INTO Currencies (code, full_name) VALUES (?, ?)
+            # ON CONFLICT(code) DO UPDATE SET full_name=excluded.full_name
+        """,
+        (currency.code, currency.full_name)
+    )
+    conn.commit()
+    conn.close()
 
 
 def get_all_exchange_rates() -> list[ExchangeRate]:
@@ -45,14 +54,29 @@ def get_all_exchange_rates() -> list[ExchangeRate]:
     return [ExchangeRate(row["base_curr"], row["target_curr"], row["rate"]) for row in rows]
 
 
-def add_exchange_rate(Rate) -> None:
-    pass
+def add_exchange_rate(exchange_rate: ExchangeRate) -> None:
+    conn = _get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO ExchangeRates (base_curr, target_curr, rate)
+                VALUES (
+                    (SELECT id FROM Currencies WHERE code = ?),
+                    (SELECT id FROM Currencies WHERE code = ?),
+                    ?
+                )
+        """,
+        (exchange_rate.base_curr, exchange_rate.target_curr, exchange_rate.rate)
+    )
+    conn.commit()
+    conn.close()
 
 
 def get_exchange_rate(from_code, to_code) -> float | None:
     conn = _get_conn()
     cur = conn.cursor()
-    cur.execute("SELECT rate FROM ExchangeRates WHERE base_curr = ? AND target_curr = ?", (from_code, to_code))
+    cur.execute("SELECT rate FROM ExchangeRates WHERE base_curr = ? AND target_curr = ?",
+                (from_code, to_code)
+    )
     row = cur.fetchone()
     conn.close()
     
