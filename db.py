@@ -2,13 +2,12 @@ import json
 import sqlite3
 from urllib.request import urlopen
 from app.dao import add_currency, add_exchange_rate
+from app.handlers import ACCESS_KEY
 from app.models import Currency, ExchangeRate
 
 
 API_URL = "http://localhost:8000"
 # API_URL = "https://api.exchangerate.host"
-
-ACCESS_KEY = 'dff5d216fd9de66bfd816b3703cad9c7'
 
 
 def fetch_currencies() -> dict | None:

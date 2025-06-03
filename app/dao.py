@@ -11,7 +11,7 @@ def _get_conn():
     return conn
 
 
-def get_all_curencies() -> list[Currency]:
+def get_all_currencies() -> list[Currency]:
     conn = _get_conn()
     cur = conn.cursor()
     cur.execute("SELECT code, full_name FROM Currencies")
