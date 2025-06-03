@@ -6,12 +6,14 @@ from app.models import Currency, ExchangeRate
 
 
 API_URL = "http://localhost:8000"
+# API_URL = "https://api.exchangerate.host"
+
 ACCESS_KEY = 'dff5d216fd9de66bfd816b3703cad9c7'
 
 
 def fetch_currencies() -> dict | None:
     try:
-        with urlopen(API_URL + '/list') as req:
+        with urlopen(API_URL + '/list' + '?access_key=' + ACCESS_KEY) as req:
             data = json.load(req)
     except Exception as e:
         print(e)
@@ -21,7 +23,7 @@ def fetch_currencies() -> dict | None:
 
 def fetch_exchange_rates() -> dict | None:
     try:
-        with urlopen(API_URL + '/live') as req:
+        with urlopen(API_URL + '/live' + '?access_key=' + ACCESS_KEY) as req:
             data = json.load(req)
     except Exception as e:
         print(e)
