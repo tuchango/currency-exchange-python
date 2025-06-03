@@ -1,6 +1,8 @@
 import json
 import sqlite3
 from urllib.request import urlopen
+from app.dao import add_currency, add_exchange_rate
+from app.models import Currency, ExchangeRate
 
 
 API_URL = "http://localhost:8000"
@@ -22,8 +24,8 @@ def update_db_from_api():
 
     # записываем их в бд
     for currency in currencies:
-        con.execute("INSERT INTO Currencies (code, full_name) VALUES (?, ?)", (currency, currencies[currency]))
-    
+        add_currency(Currency(currency, currencies[currency]))
+
     con.commit()
 
     # запрашиваем обменные курсы к доллару
@@ -38,15 +40,7 @@ def update_db_from_api():
 
     # записываем их в бд
     for exchange_rate in exchange_rates:
-        con.execute(
-            """
-                INSERT INTO ExchangeRates (base_curr, target_curr, rate)
-                VALUES (
-                    (SELECT id FROM Currencies WHERE code = ?),
-                    (SELECT id FROM Currencies WHERE code = ?),
-                    ?
-                )
-            """, (exchange_rate[:3], exchange_rate[3:], exchange_rates[exchange_rate]))
+        add_exchange_rate(ExchangeRate(exchange_rate[:3], exchange_rate[3:], exchange_rates[exchange_rate]))
         
     con.commit()
     con.close()

@@ -1,7 +1,7 @@
 import sqlite3
 from app.models import Currency, ExchangeRate
 
-DB_PATH = "../currencies.db"
+DB_PATH = "currencies.db"
 
 
 def _get_conn():
@@ -35,10 +35,8 @@ def get_currency_by_code(code: str) -> Currency | None:
 def add_currency(currency: Currency) -> None:
     conn = _get_conn()
     cur = conn.cursor()
-    cur.execute("""
-            INSERT INTO Currencies (code, full_name) VALUES (?, ?)
-            # ON CONFLICT(code) DO UPDATE SET full_name=excluded.full_name
-        """,
+    cur.execute("INSERT INTO Currencies (code, full_name) VALUES (?, ?)",
+    # -- ON CONFLICT(code) DO UPDATE SET full_name=excluded.full_name
         (currency.code, currency.full_name)
     )
     conn.commit()
