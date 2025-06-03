@@ -9,40 +9,43 @@ API_URL = "http://localhost:8000"
 ACCESS_KEY = 'dff5d216fd9de66bfd816b3703cad9c7'
 
 
-def update_db_from_api():
-    con = sqlite3.connect('currencies.db')
-
-    # запрашиваем список валют
+def fetch_currencies() -> dict | None:
     try:
         with urlopen(API_URL + '/list') as req:
             data = json.load(req)
     except Exception as e:
         print(e)
         return None
+    return data.get("currencies")
 
-    currencies = data.get("currencies")
 
-    # записываем их в бд
-    for currency in currencies:
-        add_currency(Currency(currency, currencies[currency]))
-
-    con.commit()
-
-    # запрашиваем обменные курсы к доллару
+def fetch_exchange_rates() -> dict | None:
     try:
         with urlopen(API_URL + '/live') as req:
             data = json.load(req)
     except Exception as e:
         print(e)
         return None
+    return data.get("quotes")
 
-    exchange_rates = data.get("quotes")
+
+def update_db_from_api():
+    con = sqlite3.connect('currencies.db')
+
+    # запрашиваем список валют
+    currencies = fetch_currencies()
+
+    # записываем их в бд
+    for currency in currencies:
+        add_currency(Currency(currency, currencies[currency]))
+
+    # запрашиваем обменные курсы к доллару
+    exchange_rates = fetch_exchange_rates()
 
     # записываем их в бд
     for exchange_rate in exchange_rates:
         add_exchange_rate(ExchangeRate(exchange_rate[:3], exchange_rate[3:], exchange_rates[exchange_rate]))
         
-    con.commit()
     con.close()
 
 def create_db_and_fill_it():
