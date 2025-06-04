@@ -1,29 +1,28 @@
 from http.server import BaseHTTPRequestHandler
 import json
 from urllib.parse import parse_qs, urlparse
-from urllib.request import urlopen
-from app.dao import get_all_currencies, get_all_exchange_rates
+from app.services import list_currencies, list_exchange_rates
+from config import ACCESS_KEY
 
 
-ACCESS_KEY = 'dff5d216fd9de66bfd816b3703cad9c7'
-API_URL = "https://api.exchangerate.host"
+# API_URL = "https://api.exchangerate.host"
 
 
-def fetch_rate(ACCESS_KEY: str, from_curr: str, to_curr: str, amount: float) -> float | None:
-    """
-    Запрашивает курс base → target у exchangerate.host.
-    Вернёт float или None, если что-то пошло не так.
-    """
-    query = f"/convert?access_key={ACCESS_KEY}&from={from_curr}&to={to_curr}&amount={amount}"
-    try:
-        with urlopen(API_URL + query) as req:
-            data = json.load(req)
-    except Exception:
-        return None
+# def fetch_rate(ACCESS_KEY: str, from_curr: str, to_curr: str, amount: float) -> float | None:
+#     """
+#     Запрашивает курс base → target у exchangerate.host.
+#     Вернёт float или None, если что-то пошло не так.
+#     """
+#     query = f"/convert?access_key={ACCESS_KEY}&from={from_curr}&to={to_curr}&amount={amount}"
+#     try:
+#         with urlopen(API_URL + query) as req:
+#             data = json.load(req)
+#     except Exception:
+#         return None
 
-    # проверяем успех и наличие нужного поля
-    result = data.get("result")
-    return result
+#     # проверяем успех и наличие нужного поля
+#     result = data.get("result")
+#     return result
 
 
 class SimpleHTMLHandler(BaseHTTPRequestHandler):
@@ -32,7 +31,7 @@ class SimpleHTMLHandler(BaseHTTPRequestHandler):
         path = parsed.path
         
         if self.path == "/currencies":
-            data = get_all_currencies()  # возвращает list[Currency]
+            data = list_currencies()  # возвращает list[Currency]
             body = json.dumps([c.__dict__ for c in data]).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -40,7 +39,7 @@ class SimpleHTMLHandler(BaseHTTPRequestHandler):
             self.wfile.write(body)
 
         elif self.path == "/exchangeRates":
-            data = get_all_exchange_rates()  # возвращает list[ExchangeRates]
+            data = list_exchange_rates()  # возвращает list[ExchangeRates]
             body = json.dumps([c.__dict__ for c in data]).encode("utf-8")
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
